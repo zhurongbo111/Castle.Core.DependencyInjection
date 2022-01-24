@@ -1,0 +1,31 @@
+﻿
+Microsoft Visual Studio Solution File, Format Version 12.00
+# Visual Studio Version 17
+VisualStudioVersion = 17.0.32112.339
+MinimumVisualStudioVersion = 10.0.40219.1
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "DynamicProxy.AspNetCore.Example", "DynamicProxy.AspNetCore.Example\DynamicProxy.AspNetCore.Example.csproj", "{22824103-F39E-4B21-B0CC-F62F78044188}"
+EndProject
+Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "Castle.DynamicProxy.DependencyInjection", "..\src\Castle.DynamicProxy.DependencyInjection\Castle.DynamicProxy.DependencyInjection.csproj", "{57F6F94F-AE62-4FAE-B797-802C64507850}"
+EndProject
+Global
+	GlobalSection(SolutionConfigurationPlatforms) = preSolution
+		Debug|Any CPU = Debug|Any CPU
+		Release|Any CPU = Release|Any CPU
+	EndGlobalSection
+	GlobalSection(ProjectConfigurationPlatforms) = postSolution
+		{22824103-F39E-4B21-B0CC-F62F78044188}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{22824103-F39E-4B21-B0CC-F62F78044188}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{22824103-F39E-4B21-B0CC-F62F78044188}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{22824103-F39E-4B21-B0CC-F62F78044188}.Release|Any CPU.Build.0 = Release|Any CPU
+		{57F6F94F-AE62-4FAE-B797-802C64507850}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{57F6F94F-AE62-4FAE-B797-802C64507850}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{57F6F94F-AE62-4FAE-B797-802C64507850}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{57F6F94F-AE62-4FAE-B797-802C64507850}.Release|Any CPU.Build.0 = Release|Any CPU
+	EndGlobalSection
+	GlobalSection(SolutionProperties) = preSolution
+		HideSolutionNode = FALSE
+	EndGlobalSection
+	GlobalSection(ExtensibilityGlobals) = postSolution
+		SolutionGuid = {C43DFB46-9A98-4FC1-BF36-8813FC7588DF}
+	EndGlobalSection
+EndGlobal

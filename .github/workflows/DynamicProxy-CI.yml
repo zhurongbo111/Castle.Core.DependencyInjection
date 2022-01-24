@@ -1,0 +1,35 @@
+name: DynamicProxy CI
+
+on:
+  pull_request:
+    paths: ['src/**']
+
+jobs:
+  identity-ci:
+
+    runs-on: ubuntu-latest
+    env:
+      working-directory: ./src
+
+    steps:
+    - uses: actions/checkout@v2
+    - name: Setup .NET Core
+      uses: actions/setup-dotnet@v1
+      with:
+        dotnet-version: 6.0.*
+
+    - name: Set nuget token
+      uses: allenevans/set-env@v2.1.0
+      with:
+        NUGET_ACCESS_TOKEN: ${{secrets.NUGET_ACCESS_TOKEN}}
+        NUGET_ACCESS_USERNAME: ${{secrets.NUGET_ACCESS_USERNAME}}
+
+    - name: Install dependencies      
+      run: dotnet restore
+      working-directory: ${{env.working-directory}}
+    - name: Build     
+      run: dotnet build --configuration Release --no-restore
+      working-directory: ${{env.working-directory}}
+    - name: Test
+      run: dotnet test --no-restore --verbosity normal
+      working-directory: ${{env.working-directory}}

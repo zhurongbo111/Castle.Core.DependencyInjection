@@ -40,7 +40,7 @@ namespace Castle.DynamicProxy.DependencyInjection
                 var proxyBuilder = new ProxyServiceBuilder(serviceDescriptor)
                 {
                     Services = services,
-                    TypeToProxy = serviceType,
+                    ProxyType = serviceType.IsInterface ? ProxyType.InterfaceWithTarget : ProxyType.ClassWithTarget
                 };
 
                 proxySetup.Invoke(proxyBuilder);

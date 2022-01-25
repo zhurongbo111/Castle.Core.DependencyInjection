@@ -10,7 +10,7 @@ namespace Castle.DynamicProxy.DependencyInjection
     {
         private readonly ServiceDescriptor _oiginServiceDescriptor;
 
-        private ProxyGenerationOptions _generationOptions;
+        private ProxyGenerationOptions _generationOptions = ProxyGenerationOptions.Default;
 
         public ProxyServiceBuilder(ServiceDescriptor oiginServiceDescriptor)
         {
@@ -26,7 +26,7 @@ namespace Castle.DynamicProxy.DependencyInjection
 
         public IServiceCollection Services { get; internal set; }
 
-        internal Type TypeToProxy { get; set; }
+        internal ProxyType ProxyType { get; set; }
 
         internal List<Type> InterceptorTypes { get; set; } = new List<Type>();
 
@@ -93,27 +93,18 @@ namespace Castle.DynamicProxy.DependencyInjection
             }
 
             var proxyGenerator = sp.GetRequiredService<IProxyGenerator>();
-            if (_generationOptions == null)
+            switch (ProxyType)
             {
-                if (TypeToProxy.IsInterface)
-                {
-                    return proxyGenerator.CreateInterfaceProxyWithTarget(_oiginServiceDescriptor.ServiceType, target, interceptors.ToArray());
-                }
-                else
-                {
-                    return proxyGenerator.CreateClassProxyWithTarget(_oiginServiceDescriptor.ServiceType, target, interceptors.ToArray());
-                }
-            }
-            else
-            {
-                if (TypeToProxy.IsInterface)
-                {
+                case ProxyType.InterfaceWithTarget:
                     return proxyGenerator.CreateInterfaceProxyWithTarget(_oiginServiceDescriptor.ServiceType, target, _generationOptions, interceptors.ToArray());
-                }
-                else
-                {
+                case ProxyType.InterfaceWithoutTarget:
+                    return proxyGenerator.CreateInterfaceProxyWithoutTarget(_oiginServiceDescriptor.ServiceType, _generationOptions, interceptors.ToArray());
+                case ProxyType.ClassWithTarget:
                     return proxyGenerator.CreateClassProxyWithTarget(_oiginServiceDescriptor.ServiceType, target, _generationOptions, interceptors.ToArray());
-                }
+                case ProxyType.ClassWithoutTarget:
+                    return proxyGenerator.CreateClassProxy(_oiginServiceDescriptor.ServiceType, _generationOptions, interceptors.ToArray());
+                default:
+                    throw new Exception($"Unkonw proxy type: {ProxyType}");
             }
         }
     }

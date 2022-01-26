@@ -8,7 +8,7 @@ using Microsoft.Extensions.DependencyInjection.Extensions;
 
 namespace Castle.DynamicProxy.DependencyInjection
 {
-    public static class CastleDynamicProxyServiceCollectionExtensions
+    public static class EnableInterceptorServiceCollectionExtensions
     {
         public static IServiceCollection AddProxyCore(this IServiceCollection services)
         {
@@ -32,7 +32,7 @@ namespace Castle.DynamicProxy.DependencyInjection
             var serviceDescriptors = services.Where(sd => sd.ServiceType == serviceType).ToList();
             if (!serviceDescriptors.Any())
             {
-                throw new InvalidOperationException("Please register this service firstly");
+                throw new InvalidOperationException($"Please add this service tye {serviceType.FullName} firstly. If you want to build an none-target object, please use services.AddProxyServiceWithoutTarget(...)");
             }
 
             services.AddProxyCore();

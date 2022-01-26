@@ -10,8 +10,6 @@ namespace Castle.DynamicProxy.DependencyInjection
         private readonly Type _serviceType;
         private readonly ServiceLifetime _serviceLifetime;
 
-        private ProxyGenerationOptions _generationOptions = ProxyGenerationOptions.Default;
-
         public WithoutTargetProxyServiceBuilder(Type serviceType, ServiceLifetime serviceLifetime, IServiceCollection services)
             : base(services)
         {
@@ -32,8 +30,8 @@ namespace Castle.DynamicProxy.DependencyInjection
             var interceptors = InterceptorProviders.Select(descriptor => descriptor.Get(sp)).ToArray();
 
             return _serviceType.IsInterface ?
-                proxyGenerator.CreateInterfaceProxyWithoutTarget(_serviceType, _generationOptions, interceptors) :
-                proxyGenerator.CreateClassProxy(_serviceType, _generationOptions, interceptors);
+                proxyGenerator.CreateInterfaceProxyWithoutTarget(_serviceType, GenerationOptions, interceptors) :
+                proxyGenerator.CreateClassProxy(_serviceType, GenerationOptions, interceptors);
         }
     }
 }

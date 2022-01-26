@@ -1,6 +1,8 @@
 ﻿using System;
 using System.Linq;
 
+using Castle.DynamicProxy.Generators;
+
 using Microsoft.Extensions.DependencyInjection;
 using Microsoft.Extensions.DependencyInjection.Extensions;
 
@@ -22,9 +24,9 @@ namespace Castle.DynamicProxy.DependencyInjection
 
         public static IServiceCollection EnableInterceptor(this IServiceCollection services, Type serviceType, Action<ProxyServiceBuilder> proxySetup)
         {
-            if (serviceType.IsGenericType && serviceType.IsGenericTypeDefinition)
+            if (serviceType.IsGenericTypeDefinition)
             {
-                throw new NotSupportedException("Currently not support intercept generic type definition");
+                throw new GeneratorException($"Can not create proxy for type {serviceType.FullName} because it is an open generic type.");
             }
 
             var serviceDescriptors = services.Where(sd => sd.ServiceType == serviceType).ToList();
@@ -40,7 +42,7 @@ namespace Castle.DynamicProxy.DependencyInjection
                 var proxyBuilder = new ProxyServiceBuilder(serviceDescriptor)
                 {
                     Services = services,
-                    ProxyType = serviceType.IsInterface ? ProxyType.InterfaceWithTarget : ProxyType.ClassWithTarget
+                    ProxyType = serviceType
                 };
 
                 proxySetup.Invoke(proxyBuilder);

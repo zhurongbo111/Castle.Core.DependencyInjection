@@ -2,11 +2,14 @@
 
 namespace Castle.DynamicProxy.DependencyInjection
 {
-    public static class ProxyServiceBuilderAsyncExtensions
+    public static partial class ProxyServiceBuilderExtensions
     {
         public static ProxyServiceBuilder WithAsyncInterceptor(this ProxyServiceBuilder proxyServiceBuilder, IAsyncInterceptor asyncInterceptor)
         {
-            proxyServiceBuilder.InterceptorInstances.Add(asyncInterceptor.ToInterceptor());
+            proxyServiceBuilder.InterceptorDescriptors.Add(new InterceptorDescriptor
+            {
+                InterceptorInstance = asyncInterceptor.ToInterceptor()
+            });
             return proxyServiceBuilder;
         }
 
@@ -18,14 +21,21 @@ namespace Castle.DynamicProxy.DependencyInjection
 
         public static ProxyServiceBuilder WithAsyncInterceptor(this ProxyServiceBuilder proxyServiceBuilder, Type asyncInterceptorType)
         {
-            proxyServiceBuilder.InterceptorTypes.Add(asyncInterceptorType);
+            proxyServiceBuilder.InterceptorDescriptors.Add(new InterceptorDescriptor
+            {
+                InterceptorType = asyncInterceptorType
+            });
 
             return proxyServiceBuilder;
         }
 
         public static ProxyServiceBuilder WithAsyncInterceptor(this ProxyServiceBuilder proxyServiceBuilder, Func<IServiceProvider, IAsyncInterceptor> asyncInterceptorFactory)
         {
-            proxyServiceBuilder.AsyncInterceptorFactory.Add(asyncInterceptorFactory);
+            proxyServiceBuilder.InterceptorDescriptors.Add(new InterceptorDescriptor
+            {
+                AsyncInterceptorFactory = asyncInterceptorFactory
+            });
+
             return proxyServiceBuilder;
         }
     }

@@ -26,85 +26,62 @@ namespace Castle.DynamicProxy.DependencyInjection
 
         public IServiceCollection Services { get; internal set; }
 
-        internal ProxyType ProxyType { get; set; }
+        internal Type ProxyType { get; set; }
 
-        internal List<Type> InterceptorTypes { get; set; } = new List<Type>();
+        internal ServiceLifetime? ProxyLifetime { get; set; }
 
-        internal List<IInterceptor> InterceptorInstances { get; set; } = new List<IInterceptor>();
-
-        internal List<Func<IServiceProvider, IInterceptor>> InterceptorFactory { get; set; } = new List<Func<IServiceProvider, IInterceptor>>();
-
-        internal List<Func<IServiceProvider, IAsyncInterceptor>> AsyncInterceptorFactory { get; set; } = new List<Func<IServiceProvider, IAsyncInterceptor>>();
+        internal List<InterceptorDescriptor> InterceptorDescriptors { get; set; } = new List<InterceptorDescriptor>();
 
         internal IServiceCollection Build()
         {
             var services = this.Services;
 
-            services.Remove(_oiginServiceDescriptor);
-
-            services.Add(ServiceDescriptor.Describe(_oiginServiceDescriptor.ServiceType, ProxyServiceImplementationFactory, _oiginServiceDescriptor.Lifetime));
+            if (_oiginServiceDescriptor != null)
+            {
+                services.Remove(_oiginServiceDescriptor);
+                services.Add(ServiceDescriptor.Describe(_oiginServiceDescriptor.ServiceType, ProxyServiceImplementationFactory, _oiginServiceDescriptor.Lifetime));
+            }
+            else
+            {
+                services.Add(ServiceDescriptor.Describe(ProxyType, ProxyServiceImplementationFactory, ProxyLifetime.Value));
+            }
 
             return services;
         }
 
         private object ProxyServiceImplementationFactory(IServiceProvider sp)
         {
-            object target;
-            if (_oiginServiceDescriptor.ImplementationInstance != null)
-            {
-                target = _oiginServiceDescriptor.ImplementationInstance;
-            }
-            else if (_oiginServiceDescriptor.ImplementationFactory != null)
-            {
-                target = _oiginServiceDescriptor.ImplementationFactory.Invoke(sp);
-            }
-            else
-            {
-                target = ActivatorUtilities.GetServiceOrCreateInstance(sp, _oiginServiceDescriptor.ImplementationType);
-            }
+            var proxyGenerator = sp.GetRequiredService<IProxyGenerator>();
 
-            List<IInterceptor> interceptors = new List<IInterceptor>();
-            foreach (var interceptorType in this.InterceptorTypes)
+            if (_oiginServiceDescriptor != null)
             {
-                var interceptorInstance = ActivatorUtilities.GetServiceOrCreateInstance(sp, interceptorType);
-                if (interceptorInstance is IAsyncInterceptor asyncInterceptorInstance)
+                object target;
+                if (_oiginServiceDescriptor.ImplementationInstance != null)
                 {
-                    interceptors.Add(asyncInterceptorInstance.ToInterceptor());
+                    target = _oiginServiceDescriptor.ImplementationInstance;
+                }
+                else if (_oiginServiceDescriptor.ImplementationFactory != null)
+                {
+                    target = _oiginServiceDescriptor.ImplementationFactory.Invoke(sp);
                 }
                 else
                 {
-                    interceptors.Add((IInterceptor)interceptorInstance);
+                    target = ActivatorUtilities.GetServiceOrCreateInstance(sp, _oiginServiceDescriptor.ImplementationType);
                 }
-            }
 
-            if (InterceptorInstances.Any())
-            {
-                interceptors.AddRange(InterceptorInstances);
-            }
+                var interceptors = InterceptorDescriptors.Select(descriptor => descriptor.Generate(sp)).ToArray();
 
-            if (AsyncInterceptorFactory.Any())
-            {
-                interceptors.AddRange(AsyncInterceptorFactory.Select(factory => factory.Invoke(sp).ToInterceptor()));
+                return _oiginServiceDescriptor.ServiceType.IsInterface ?
+                    proxyGenerator.CreateInterfaceProxyWithTarget(_oiginServiceDescriptor.ServiceType, target, _generationOptions, interceptors) :
+                    proxyGenerator.CreateClassProxyWithTarget(_oiginServiceDescriptor.ServiceType, target, _generationOptions, interceptors);
             }
-
-            if (InterceptorFactory.Any())
+            else
             {
-                interceptors.AddRange(InterceptorFactory.Select(factory => factory.Invoke(sp)));
-            }
+                var interceptors = InterceptorDescriptors.Select(descriptor => descriptor.Generate(sp)).ToArray();
 
-            var proxyGenerator = sp.GetRequiredService<IProxyGenerator>();
-            switch (ProxyType)
-            {
-                case ProxyType.InterfaceWithTarget:
-                    return proxyGenerator.CreateInterfaceProxyWithTarget(_oiginServiceDescriptor.ServiceType, target, _generationOptions, interceptors.ToArray());
-                case ProxyType.InterfaceWithoutTarget:
-                    return proxyGenerator.CreateInterfaceProxyWithoutTarget(_oiginServiceDescriptor.ServiceType, _generationOptions, interceptors.ToArray());
-                case ProxyType.ClassWithTarget:
-                    return proxyGenerator.CreateClassProxyWithTarget(_oiginServiceDescriptor.ServiceType, target, _generationOptions, interceptors.ToArray());
-                case ProxyType.ClassWithoutTarget:
-                    return proxyGenerator.CreateClassProxy(_oiginServiceDescriptor.ServiceType, _generationOptions, interceptors.ToArray());
-                default:
-                    throw new Exception($"Unkonw proxy type: {ProxyType}");
+                return ProxyType.IsInterface ?
+                    proxyGenerator.CreateInterfaceProxyWithoutTarget(ProxyType, _generationOptions, interceptors) :
+                    proxyGenerator.CreateClassProxy(ProxyType, _generationOptions, interceptors);
             }
         }
     }

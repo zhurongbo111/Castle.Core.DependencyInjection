@@ -17,12 +17,12 @@ namespace Castle.DynamicProxy.DependencyInjection
             return services;
         }
 
-        public static IServiceCollection EnableInterceptor<TService>(this IServiceCollection services, Action<ProxyServiceBuilder> proxySetup)
+        public static IServiceCollection EnableInterceptor<TService>(this IServiceCollection services, Action<IProxyServiceBuilder> proxySetup)
         {
             return services.EnableInterceptor(typeof(TService), proxySetup);
         }
 
-        public static IServiceCollection EnableInterceptor(this IServiceCollection services, Type serviceType, Action<ProxyServiceBuilder> proxySetup)
+        public static IServiceCollection EnableInterceptor(this IServiceCollection services, Type serviceType, Action<IProxyServiceBuilder> proxySetup)
         {
             if (serviceType.IsGenericTypeDefinition)
             {
@@ -39,12 +39,7 @@ namespace Castle.DynamicProxy.DependencyInjection
 
             foreach (var serviceDescriptor in serviceDescriptors)
             {
-                var proxyBuilder = new ProxyServiceBuilder(serviceDescriptor)
-                {
-                    Services = services,
-                    ProxyType = serviceType
-                };
-
+                var proxyBuilder = new ProxyServiceBuilder(services, serviceDescriptor);
                 proxySetup.Invoke(proxyBuilder);
                 proxyBuilder.Build();
             }

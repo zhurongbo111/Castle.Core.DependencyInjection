@@ -8,7 +8,7 @@ namespace Castle.DynamicProxy.DependencyInjection
 {
     public static partial class DynamicProxyServiceCollectionExtensions
     {
-        public static IServiceCollection AddProxyServiceWithoutTarget(this IServiceCollection services, Type serviceType, ServiceLifetime serviceLifetime, Action<ProxyServiceBuilder> proxySetup)
+        public static IServiceCollection AddProxyServiceWithoutTarget(this IServiceCollection services, Type serviceType, ServiceLifetime serviceLifetime, Action<IProxyServiceBuilder> proxySetup)
         {
             if (serviceType.IsGenericTypeDefinition)
             {
@@ -17,12 +17,7 @@ namespace Castle.DynamicProxy.DependencyInjection
 
             services.AddProxyCore();
 
-            var proxyBuilder = new ProxyServiceBuilder(null)
-            {
-                Services = services,
-                ProxyType = serviceType,
-                ProxyLifetime = serviceLifetime,
-            };
+            var proxyBuilder = new WithoutTargetProxyServiceBuilder(serviceType, serviceLifetime, services);
 
             proxySetup.Invoke(proxyBuilder);
             proxyBuilder.Build();
@@ -30,7 +25,7 @@ namespace Castle.DynamicProxy.DependencyInjection
             return services;
         }
 
-        public static IServiceCollection AddProxyServiceWithoutTarget<TService>(this IServiceCollection services, ServiceLifetime serviceLifetime, Action<ProxyServiceBuilder> proxySetup)
+        public static IServiceCollection AddProxyServiceWithoutTarget<TService>(this IServiceCollection services, ServiceLifetime serviceLifetime, Action<IProxyServiceBuilder> proxySetup)
         {
             return services.AddProxyServiceWithoutTarget(typeof(TService), serviceLifetime, proxySetup);
         }

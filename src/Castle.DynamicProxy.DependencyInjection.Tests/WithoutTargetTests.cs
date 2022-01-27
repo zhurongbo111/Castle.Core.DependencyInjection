@@ -39,6 +39,38 @@ namespace Castle.DynamicProxy.DependencyInjection.Tests
             Assert.AreEqual(1, WithoutTargetInterceptorAsync.CalledCount);
         }
 
+        [TestMethod]
+        public void ClassWithoutTarget()
+        {
+            IServiceCollection services = new ServiceCollection();
+            services.AddProxyServiceWithoutTarget<WithoutTargetService>(ServiceLifetime.Transient, builder =>
+            {
+                builder.WithInterceptor<WithoutTargetInterceptor>();
+            });
+
+            var sp = services.BuildServiceProvider();
+            var service = sp.GetRequiredService<WithoutTargetService>();
+            service.Say();
+
+            Assert.AreEqual(1, WithoutTargetInterceptor.CalledCount);
+        }
+
+        [TestMethod]
+        public void ClassWithoutTargetAsync()
+        {
+            IServiceCollection services = new ServiceCollection();
+            services.AddProxyServiceWithoutTarget<WithoutTargetService>(ServiceLifetime.Transient, builder =>
+            {
+                builder.WithAsyncInterceptor<WithoutTargetInterceptorAsync>();
+            });
+
+            var sp = services.BuildServiceProvider();
+            var service = sp.GetRequiredService<WithoutTargetService>();
+            service.Say();
+
+            Assert.AreEqual(1, WithoutTargetInterceptorAsync.CalledCount);
+        }
+
         [TestCleanup]
         public void TestCleanup()
         {

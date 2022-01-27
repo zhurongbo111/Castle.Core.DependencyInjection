@@ -4,9 +4,4 @@
     {
         void Say(string message);
     }
-
-    public interface IWithoutTargetService
-    {
-        void Say(string message);
-    }
 }

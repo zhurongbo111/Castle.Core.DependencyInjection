@@ -60,17 +60,19 @@ namespace Castle.DynamicProxy.DependencyInjection
 
             var constructorInfo = ObjectFactoryUtils.GetConstructInfo(_oiginServiceDescriptor.ImplementationType);
 
-            object[] constructorArguments = constructorInfo.DefaultArguments;
+            object[] constructorArguments;
 
             object target;
 
             if (_oiginServiceDescriptor.ImplementationInstance != null)
             {
                 target = _oiginServiceDescriptor.ImplementationInstance;
+                constructorArguments = constructorInfo.SearchOrCreateArguments(sp, target);
             }
             else if (_oiginServiceDescriptor.ImplementationFactory != null)
             {
                 target = _oiginServiceDescriptor.ImplementationFactory.Invoke(sp);
+                constructorArguments = constructorInfo.SearchOrCreateArguments(sp, target);
             }
             else
             {
@@ -82,7 +84,6 @@ namespace Castle.DynamicProxy.DependencyInjection
             var interceptors = InterceptorProviders.Select(descriptor => descriptor.Get(sp)).ToArray();
 
             return proxyGenerator.CreateClassProxyWithTarget(_oiginServiceDescriptor.ServiceType, target, GenerationOptions, constructorArguments, interceptors);
-
         }
     }
 }

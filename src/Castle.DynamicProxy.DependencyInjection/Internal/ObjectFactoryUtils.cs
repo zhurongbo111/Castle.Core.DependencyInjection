@@ -34,7 +34,7 @@ namespace Castle.DynamicProxy.DependencyInjection
                             Arguments = new object[0]
                         },
                         ConstructArgumentTypes = new Type[0],
-                        DefaultArguments = new object[0]
+                        SearchOrCreateArguments = SearchCorrespondingArgumentsFromTarget(type, new Type[0])
                     };
                 }
                 else
@@ -52,7 +52,7 @@ namespace Castle.DynamicProxy.DependencyInjection
                             };
                         },
                         ConstructArgumentTypes = argumentTypes,
-                        DefaultArguments = argumentTypes.Select(argumentType => argumentType.IsValueType ? Activator.CreateInstance(argumentType) : null).ToArray()
+                        SearchOrCreateArguments = SearchCorrespondingArgumentsFromTarget(type, argumentTypes)
                     };
                 }
             });
@@ -63,15 +63,40 @@ namespace Castle.DynamicProxy.DependencyInjection
             var types = GetConstructInfo(type).ConstructArgumentTypes;
             return types.Select(t => sp.GetRequiredService(t)).ToArray();
         }
+
+        private static Func<IServiceProvider, object, object[]> SearchCorrespondingArgumentsFromTarget(Type targetType, Type[] argumentTypes)
+        {
+            var fields = targetType.GetFields(BindingFlags.Instance);
+            var properties = targetType.GetProperties(BindingFlags.Instance);
+            return (sp, target) =>
+            {
+                return argumentTypes.Select(argumentType =>
+                {
+                    var matchedFields = fields.Where(field => field.FieldType == argumentType).ToArray();
+                    if (matchedFields.Any())
+                    {
+                        return matchedFields[0].GetValue(target);
+                    }
+
+                    var matchedProperties = properties.Where(p => p.PropertyType == argumentType).ToArray();
+                    if (matchedProperties.Any())
+                    {
+                        return matchedProperties[0].GetValue(target);
+                    }
+
+                    return sp.GetService(argumentType) ?? (argumentType.IsValueType ? Activator.CreateInstance(argumentType) : null);
+                }).ToArray();
+            };
+        }
     }
 
     internal class ConstructorInfo
     {
         internal Func<IServiceProvider, InstanceAndArguments> Factory { get; set; }
 
-        internal object[] DefaultArguments { get; set; }
-
         internal Type[] ConstructArgumentTypes { get; set; }
+
+        internal Func<IServiceProvider, object, object[]> SearchOrCreateArguments { get; set; }
     }
 
     internal class InstanceAndArguments

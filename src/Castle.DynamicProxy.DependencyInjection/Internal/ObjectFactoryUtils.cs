@@ -44,7 +44,7 @@ namespace Castle.DynamicProxy.DependencyInjection
                     {
                         Factory = sp =>
                         {
-                            var arguments = argumentTypes.Select(argumentType => sp.GetRequiredService(argumentType)).ToArray();
+                            var arguments = argumentTypes.Select(argumentType => sp.GetService(argumentType) ?? throw new InvalidOperationException($"Unable to resolve service for type '{argumentType}' while attempting to activate '{type}'.")).ToArray();
                             return new InstanceAndArguments
                             {
                                 Instance = macthedConstructInfo.Invoke(arguments),
@@ -61,7 +61,7 @@ namespace Castle.DynamicProxy.DependencyInjection
         internal static object[] GetConstructArguments(Type type, IServiceProvider sp)
         {
             var types = GetConstructInfo(type).ConstructArgumentTypes;
-            return types.Select(t => sp.GetRequiredService(t)).ToArray();
+            return types.Select(t => sp.GetService(t) ?? throw new InvalidOperationException($"Unable to resolve service for type '{t}' while attempting to activate '{type}'.")).ToArray();
         }
 
         private static Func<IServiceProvider, object, object[]> SearchCorrespondingArgumentsFromTarget(Type targetType, Type[] argumentTypes)

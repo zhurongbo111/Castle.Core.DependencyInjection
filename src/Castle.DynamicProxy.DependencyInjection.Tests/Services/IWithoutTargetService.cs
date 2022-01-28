@@ -2,7 +2,7 @@
 {
     public interface IWithoutTargetService
     {
-        void Say(string message);
+        void Say();
     }
 
     public class WithoutTargetService

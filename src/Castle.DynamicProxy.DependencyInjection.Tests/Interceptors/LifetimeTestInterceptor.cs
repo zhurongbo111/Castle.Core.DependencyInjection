@@ -1,6 +1,4 @@
-﻿using System;
-
-namespace Castle.DynamicProxy.DependencyInjection.Tests
+﻿namespace Castle.DynamicProxy.DependencyInjection.Tests
 {
     internal class LifetimeTestInterceptor : IInterceptor
     {
@@ -13,9 +11,7 @@ namespace Castle.DynamicProxy.DependencyInjection.Tests
 
         public void Intercept(IInvocation invocation)
         {
-            Console.WriteLine($"{nameof(LifetimeTestInterceptor)} is called before executing");
             invocation.Proceed();
-            Console.WriteLine($"{nameof(LifetimeTestInterceptor)} is called after executing");
         }
     }
 }

@@ -8,7 +8,7 @@ namespace Castle.DynamicProxy.DependencyInjection
     {
         IServiceCollection Services { get; }
 
-        void WithProxyGenerationOptions(ProxyGenerationOptions proxyGenerationOptions);
+        ProxyGenerationOptions GenerationOptions { get; set; }
 
         List<IInterceptorProvider> InterceptorProviders { get; }
 

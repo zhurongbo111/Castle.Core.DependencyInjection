@@ -45,7 +45,7 @@ namespace Castle.DynamicProxy.DependencyInjection
             }
             else
             {
-                target = ObjectFactoryUtils.GetConstructInfo(_oiginServiceDescriptor.ImplementationType).Factory.Invoke(sp).Instance;
+                target = ConstructUtils.GetConstructInfo(_oiginServiceDescriptor.ImplementationType).Factory.Invoke(sp).Instance;
             }
 
             var interceptors = InterceptorProviders.Select(descriptor => descriptor.Get(sp)).ToArray();
@@ -58,7 +58,7 @@ namespace Castle.DynamicProxy.DependencyInjection
         {
             var proxyGenerator = sp.GetRequiredService<IProxyGenerator>();
 
-            var constructorInfo = ObjectFactoryUtils.GetConstructInfo(_oiginServiceDescriptor.ImplementationType);
+            var constructorInfo = ConstructUtils.GetConstructInfo(_oiginServiceDescriptor.ImplementationType);
 
             object[] constructorArguments;
 

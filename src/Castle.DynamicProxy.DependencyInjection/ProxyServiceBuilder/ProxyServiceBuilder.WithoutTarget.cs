@@ -31,7 +31,7 @@ namespace Castle.DynamicProxy.DependencyInjection
 
             return _serviceType.IsInterface ?
                 proxyGenerator.CreateInterfaceProxyWithoutTarget(_serviceType, GenerationOptions, interceptors) :
-                proxyGenerator.CreateClassProxy(_serviceType, GenerationOptions, ObjectFactoryUtils.GetConstructArguments(_serviceType, sp), interceptors);
+                proxyGenerator.CreateClassProxy(_serviceType, GenerationOptions, ConstructUtils.GetConstructArgumentsFromClass(_serviceType, sp), interceptors);
         }
     }
 }

@@ -11,17 +11,12 @@ namespace Castle.DynamicProxy.DependencyInjection
             Services = services;
         }
 
-        protected ProxyGenerationOptions GenerationOptions { get; private set; } = new ProxyGenerationOptions();
+        public ProxyGenerationOptions GenerationOptions { get; set; } = new ProxyGenerationOptions();
 
         public List<IInterceptorProvider> InterceptorProviders { get; } = new List<IInterceptorProvider>();
 
         public IServiceCollection Services { get; }
 
         public abstract void Build();
-
-        public void WithProxyGenerationOptions(ProxyGenerationOptions proxyGenerationOptions)
-        {
-            GenerationOptions = proxyGenerationOptions;
-        }
     }
 }

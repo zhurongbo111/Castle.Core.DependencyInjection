@@ -3,21 +3,19 @@ using System.Collections.Concurrent;
 using System.Linq;
 using System.Reflection;
 
-using Microsoft.Extensions.DependencyInjection;
-
 namespace Castle.DynamicProxy.DependencyInjection
 {
-    internal static class ObjectFactoryUtils
+    internal static class ConstructUtils
     {
-        private static readonly ConcurrentDictionary<Type, ConstructorInfo> _factoryCache = new ConcurrentDictionary<Type, ConstructorInfo>();
+        private static readonly ConcurrentDictionary<Type, ConstructorInfo> _constructInfoCache = new ConcurrentDictionary<Type, ConstructorInfo>();
 
         internal static ConstructorInfo GetConstructInfo(Type type)
         {
-            return _factoryCache.GetOrAdd(type, _ =>
+            return _constructInfoCache.GetOrAdd(type, _ =>
             {
                 var constructorInfos = type.GetConstructors(BindingFlags.Public | BindingFlags.Instance);
 
-                var macthedConstructInfo = constructorInfos.FirstOrDefault(c => c.IsDefined(typeof(ActivatorUtilitiesConstructorAttribute), inherit: false));
+                var macthedConstructInfo = constructorInfos.FirstOrDefault(c => c.IsDefined(typeof(DynamicProxyConstructorAttribute), inherit: false));
                 if (macthedConstructInfo == null)
                 {
                     macthedConstructInfo = constructorInfos.OrderByDescending(c => c.GetParameters().Length).First();
@@ -58,7 +56,7 @@ namespace Castle.DynamicProxy.DependencyInjection
             });
         }
 
-        internal static object[] GetConstructArguments(Type type, IServiceProvider sp)
+        internal static object[] GetConstructArgumentsFromClass(Type type, IServiceProvider sp)
         {
             var types = GetConstructInfo(type).ConstructArgumentTypes;
             return types.Select(t => sp.GetService(t) ?? throw new InvalidOperationException($"Unable to resolve service for type '{t}' while attempting to activate '{type}'.")).ToArray();
@@ -88,21 +86,5 @@ namespace Castle.DynamicProxy.DependencyInjection
                 }).ToArray();
             };
         }
-    }
-
-    internal class ConstructorInfo
-    {
-        internal Func<IServiceProvider, InstanceAndArguments> Factory { get; set; }
-
-        internal Type[] ConstructArgumentTypes { get; set; }
-
-        internal Func<IServiceProvider, object, object[]> SearchOrCreateArguments { get; set; }
-    }
-
-    internal class InstanceAndArguments
-    {
-        public object Instance { get; set; }
-
-        public object[] Arguments { get; set; }
     }
 }

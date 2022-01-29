@@ -4,11 +4,23 @@ namespace Castle.DynamicProxy.DependencyInjection
 {
     public static partial class ProxyServiceBuilderExtensions
     {
-        public static IProxyServiceBuilder WithProxyGenerationOptions(this IProxyServiceBuilder proxyServiceBuilder, ProxyGenerationOptions proxyGenerationOptions)
+        public static IProxyServiceBuilder WithProxyGenerationOptions(this IProxyServiceBuilder proxyServiceBuilder, Func<IServiceProvider, ProxyGenerationOptions> optionFactory)
         {
-            proxyServiceBuilder.GenerationOptions = proxyGenerationOptions;
+            proxyServiceBuilder.ProxyOptionCreator = optionFactory;
 
             return proxyServiceBuilder;
+        }
+
+        public static IProxyServiceBuilder WithProxyGenerationOptions(this IProxyServiceBuilder proxyServiceBuilder, Action<ProxyGenerationOptions> optionBuilder)
+        {
+            Func<IServiceProvider, ProxyGenerationOptions> optionFactory = sp =>
+            {
+                var proxyGenerationOptions = new ProxyGenerationOptions();
+                optionBuilder.Invoke(proxyGenerationOptions);
+                return proxyGenerationOptions;
+            };
+
+            return proxyServiceBuilder.WithProxyGenerationOptions(optionFactory);
         }
 
         public static IProxyServiceBuilder WithInterceptor(this IProxyServiceBuilder proxyServiceBuilder, IInterceptor interceptor)

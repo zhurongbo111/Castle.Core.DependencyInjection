@@ -1,4 +1,5 @@
-﻿using System.Collections.Generic;
+﻿using System;
+using System.Collections.Generic;
 
 using Microsoft.Extensions.DependencyInjection;
 
@@ -8,7 +9,7 @@ namespace Castle.DynamicProxy.DependencyInjection
     {
         IServiceCollection Services { get; }
 
-        ProxyGenerationOptions GenerationOptions { get; set; }
+        Func<IServiceProvider, ProxyGenerationOptions> ProxyOptionCreator { get; set; }
 
         List<IInterceptorProvider> InterceptorProviders { get; }
 

@@ -58,8 +58,6 @@ namespace Castle.DynamicProxy.DependencyInjection
         {
             var proxyGenerator = sp.GetRequiredService<IProxyGenerator>();
 
-            var constructorInfo = ConstructUtils.GetConstructInfo(_oiginServiceDescriptor.ImplementationType);
-
             object[] constructorArguments;
 
             object target;
@@ -67,15 +65,18 @@ namespace Castle.DynamicProxy.DependencyInjection
             if (_oiginServiceDescriptor.ImplementationInstance != null)
             {
                 target = _oiginServiceDescriptor.ImplementationInstance;
+                var constructorInfo = ConstructUtils.GetConstructInfo(target.GetType());
                 constructorArguments = constructorInfo.SearchOrCreateArguments(sp, target);
             }
             else if (_oiginServiceDescriptor.ImplementationFactory != null)
             {
                 target = _oiginServiceDescriptor.ImplementationFactory.Invoke(sp);
+                var constructorInfo = ConstructUtils.GetConstructInfo(target.GetType());
                 constructorArguments = constructorInfo.SearchOrCreateArguments(sp, target);
             }
             else
             {
+                var constructorInfo = ConstructUtils.GetConstructInfo(_oiginServiceDescriptor.ImplementationType ?? _oiginServiceDescriptor.ServiceType);
                 var instanceAndArguments = constructorInfo.Factory.Invoke(sp);
                 target = instanceAndArguments.Instance;
                 constructorArguments = instanceAndArguments.Arguments;

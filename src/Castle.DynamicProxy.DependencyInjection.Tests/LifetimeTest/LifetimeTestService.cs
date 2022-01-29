@@ -11,7 +11,7 @@ namespace Castle.DynamicProxy.DependencyInjection.Tests
             InstanceCount++;
         }
 
-        public void Say(string message)
+        public virtual void Say(string message)
         {
             Debug.Write(message);
         }

@@ -1,6 +1,7 @@
 ﻿namespace Castle.DynamicProxy.DependencyInjection.Tests
 {
-    public interface ILifetimeTestService
+    public interface IAddProxyServiceTest
     {
+        void Say();
     }
 }

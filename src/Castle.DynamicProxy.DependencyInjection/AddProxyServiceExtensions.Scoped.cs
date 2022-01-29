@@ -36,11 +36,5 @@ namespace Castle.DynamicProxy.DependencyInjection
         {
             return services.AddScopedProxyService(typeof(TService), implementationFactory, proxySetup);
         }
-
-        public static IServiceCollection AddScopedProxyService<TService, TImplementation>(this IServiceCollection services, Func<IServiceProvider, TImplementation> implementationFactory, Action<IProxyServiceBuilder> proxySetup)
-            where TService : class where TImplementation : class, TService
-        {
-            return services.AddScopedProxyService(typeof(TService), implementationFactory, proxySetup);
-        }
     }
 }

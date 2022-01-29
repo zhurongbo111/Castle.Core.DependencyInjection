@@ -41,13 +41,6 @@ namespace Castle.DynamicProxy.DependencyInjection
             return services.AddSingletonProxyService(typeof(TService), implementationFactory, proxySetup);
         }
 
-        public static IServiceCollection AddSingletonProxyService<TService, TImplementation>(this IServiceCollection services, Func<IServiceProvider, TImplementation> implementationFactory, Action<IProxyServiceBuilder> proxySetup)
-            where TService : class where TImplementation : class, TService
-        {
-
-            return services.AddSingletonProxyService(typeof(TService), implementationFactory, proxySetup);
-        }
-
         public static IServiceCollection AddSingletonProxyService(this IServiceCollection services, Type serviceType, object implementationInstance, Action<IProxyServiceBuilder> proxySetup)
         {
             return services.AddSingleton(serviceType, implementationInstance).EnableInterceptor(serviceType, proxySetup);

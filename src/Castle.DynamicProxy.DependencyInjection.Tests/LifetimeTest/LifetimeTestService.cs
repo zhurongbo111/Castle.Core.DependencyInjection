@@ -1,6 +1,4 @@
-﻿using System.Diagnostics;
-
-namespace Castle.DynamicProxy.DependencyInjection.Tests
+﻿namespace Castle.DynamicProxy.DependencyInjection.Tests
 {
     public class LifetimeTestService : ILifetimeTestService
     {
@@ -9,11 +7,6 @@ namespace Castle.DynamicProxy.DependencyInjection.Tests
         public LifetimeTestService()
         {
             InstanceCount++;
-        }
-
-        public virtual void Say(string message)
-        {
-            Debug.Write(message);
         }
     }
 }

@@ -8,10 +8,5 @@
         {
             InstanceCount++;
         }
-
-        public void Say(string message)
-        {
-            System.Console.WriteLine($"{nameof(LifetimeTestService)} Say: {message}");
-        }
     }
 }

@@ -3,30 +3,20 @@ using System.Threading.Tasks;
 
 namespace Castle.DynamicProxy.DependencyInjection.Tests
 {
-    internal class WithoutTargetInterceptor : IInterceptor
-    {
-        public static int CalledCount = 0;
-
-        public void Intercept(IInvocation invocation)
-        {
-            CalledCount++;
-        }
-    }
-
-    internal class WithoutTargetInterceptorAsync : AsyncInterceptorBase
+    internal class InterceptorProviderTestAsyncInterceptor : AsyncInterceptorBase
     {
         public static int CalledCount = 0;
 
         protected override Task InterceptAsync(IInvocation invocation, IInvocationProceedInfo proceedInfo, Func<IInvocation, IInvocationProceedInfo, Task> proceed)
         {
             CalledCount++;
-            return Task.CompletedTask;
+            return proceed(invocation, proceedInfo);
         }
 
         protected override Task<TResult> InterceptAsync<TResult>(IInvocation invocation, IInvocationProceedInfo proceedInfo, Func<IInvocation, IInvocationProceedInfo, Task<TResult>> proceed)
         {
             CalledCount++;
-            return Task.FromResult(default(TResult));
+            return proceed(invocation, proceedInfo);
         }
     }
 }
